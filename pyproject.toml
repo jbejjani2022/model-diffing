@@ -46,6 +46,9 @@ dependencies = [
     # Progress & Validation
     "tqdm~=4.67",
     "pydantic~=2.11",
+
+    # [repro] direct Anthropic calls for the autoraters (upstream used OpenRouter)
+    "anthropic>=0.49",
 ]
 
 [project.optional-dependencies]

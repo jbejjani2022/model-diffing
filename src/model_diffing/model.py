@@ -6,8 +6,15 @@ import requests
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, set_seed
 
+from model_diffing import direct_api
+
 
 def check_if_open_router(model_name: str) -> bool:
+    # [repro patch] local HF inference on the cluster / direct provider APIs: skip the OpenRouter lookup
+    if os.getenv("MD_FORCE_HF") == "1":
+        return False
+    if direct_api.handles(model_name):
+        return True
     url = "https://openrouter.ai/api/v1/models"
     headers = {"Authorization": "Bearer <token>"}
     response = requests.get(url, headers=headers)
@@ -73,7 +80,7 @@ class ModelWrapper:
         else:
             self.model_name = model_name
             self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
-            if not self.api_key:
+            if not self.api_key and not direct_api.handles(model_name):  # [repro patch]
                 raise ValueError("OpenRouter mode but no API key provided")
 
         # Optional semaphore for concurrency control in generate_async
@@ -137,6 +144,10 @@ class ModelWrapper:
         **kwargs,
     ) -> str:
         """Make a single OpenRouter API request."""
+        if direct_api.handles(self.model_name):  # [repro patch] OpenAI / Anthropic / Google called directly
+            return await direct_api.request(
+                self.model_name, conversation, client, max_new_tokens, enable_thinking, seed, **kwargs
+            )
         allowed_extra = ("temperature", "top_p", "presence_penalty", "frequency_penalty")
 
         headers = {
