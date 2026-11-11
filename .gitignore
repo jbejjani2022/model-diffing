@@ -224,3 +224,4 @@ wandb/
 .api_cache/
 docs/openreview.pdf
 .DS_Store
+docs/goal.md
