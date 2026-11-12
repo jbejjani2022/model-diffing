@@ -8,8 +8,8 @@ Every deviation and filled-in detail is in [DEVIATIONS.md](DEVIATIONS.md).
 closely. The judge-based numbers do not: accuracy is 7–13 points lower, frequency 14–20 points higher and the
 acceptance rate lower than reported. Those numbers move by a similar amount when only the judge model is swapped.
 On a hypothesis with a checkable ground truth, our judges (GPT-5.4 mini, Haiku 4.5) make frequent plain errors where
-the paper's Gemini numbers and GPT-5.2 do not, so the lower accuracy largely reflects weaker judges, not a failure
-of the method.
+the paper's Gemini numbers and GPT-5.2 do not, so weaker judges are the best-supported explanation for the lower
+accuracy (tested on ten hypotheses only).
 The paper's judge (Gemini 2.5 Flash) and its third pair (two Gemini 2.5 Flash Lite revisions) could not be run at
 all: both models are retired for new API keys.
 
