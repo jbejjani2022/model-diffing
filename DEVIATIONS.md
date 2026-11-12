@@ -16,6 +16,7 @@ Reference: arXiv 2602.10371v1 and upstream code @ 27d6a4b. Three kinds of entry:
 | D4 | API seed | `seed=42` sent on every OpenRouter call | sent to OpenAI; dropped for Anthropic (unsupported) | API seeds are best-effort anyway. |
 | D5 | Generation batch size | upstream default 100 | 32, and an out-of-memory batch is split in half | 48 GB L40S. Upstream reseeds (`set_seed(42)`) per batch, so batch composition changes Qwen's random draws; Gemma is greedy and only sees bf16 padding noise. |
 | D6 | Base model weights | HF hub ids | Killarney `/model-weights/Qwen2.5-7B-Instruct`, `/model-weights/gemma-2-9b-it` | Shared read-only copies of the same checkpoints; generation_config logged per job. |
+| D7 | Summary prompt (separate experiment only; the main reproduction uses the paper's prompt) | Upstream system prompt as is | `summarize.py --constrained` appends one sentence: the hypothesis must start with "The model", state the behavior `<MODEL>` shows in the cluster's sentences, and not describe the other model, compare two models or refer to "the sentences". Same differences, embeddings, cluster labels and judge prompt; reported as separate rows (`unseeded_constrained`). | Tests whether GPT-5.4 mini's contrast-style summaries (R6) cause the low acceptance rate. |
 
 ## U: unspecified in the paper, taken from the code
 

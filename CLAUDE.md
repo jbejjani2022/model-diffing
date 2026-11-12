@@ -40,7 +40,7 @@ full list of code changes against the authors' implementation. Follow ~/vector/C
 - Model names are OpenRouter-style (`openai/gpt-5.4-mini`, `openai/gpt-5.2`, `anthropic/claude-opus-4.5`) and map to
   pinned snapshots in `direct_api.MODEL_ALIASES`.
 - Responses are cached in `.api_cache/`; token usage is appended to `.api_cache/usage.jsonl`. Set `MD_RUN_TAG` to label
-  a run and `MD_CACHE_SALT` to force fresh samples. Budget: hard stop at $250 total; estimate tokens before any
+  a run and `MD_CACHE_SALT` to force fresh samples. Budget: hard stop at $500 total (raised from $250 on 2026-11-11); estimate tokens before any
   judging run and report spend after.
 
 ## Project guidelines

@@ -134,6 +134,19 @@ and "harmful advice" hypotheses, and all three judges find most hypotheses appli
 Caveats: ten hypotheses, our regenerated responses rather than the authors', the "The model …" wording restored
 by us from the paper's "FT …", and five hypotheses per judge call instead of ten.
 
+## Why did Gemini 2.5 Flash look so good? Candidate explanations
+
+Gemini 2.5 Flash is not available to us, so none of these can be tested directly. "Evidence here" is what our runs
+say about each.
+
+| Explanation | What it would mean | Evidence here | Status |
+|---|---|---|---|
+| The pipeline was developed against Gemini | Prompts, thinking-off, 10 hypotheses per call and parsing were tuned with Gemini in the loop and transfer imperfectly | The code assumes Gemini's output habits and breaks on other models (R3, R6, R7); GPT-5.4 mini needs an extra instruction to write one-directional hypotheses | Supported indirectly |
+| Gemini is a stronger judge with reasoning off | Fewer plain judging errors | On the checkable "shorter responses" hypothesis the paper's Gemini numbers match ground truth; GPT-5.4 mini and Haiku 4.5 do not, GPT-5.2 does. Swapping to GPT-5.2 brings accuracy within 3–4 points of the paper | Supported |
+| Better long-input, multi-question bookkeeping | Keeps track of which of two long responses is which across ten hypotheses | GPT-5.4 mini is wrong twice as often when the fine-tune's response is shown second (38% vs. 19%) | Supported for our judges; untested for Gemini |
+| Gemini abstains more | N/A on unclear cases leaves easier calls | Paper frequency is 46–48% against our 63–74%, with every judge we tried. Between our own judges abstention explains only 1–2 accuracy points | Explains frequency, little of accuracy |
+| Self-agreement | The same model wrote and judged the hypotheses, and agrees with its own phrasing | Not measurable without Gemini's hypotheses, which were not published | Open |
+
 ## Things the paper does not say
 
 - **"1,000 prompts" are 915 unique prompts** (458 of the 500 test prompts); the code collapses exact duplicates.

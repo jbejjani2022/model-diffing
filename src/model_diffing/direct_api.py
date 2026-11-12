@@ -34,7 +34,7 @@ PROVIDERS = ("openai", "anthropic", "google")
 KEY_ENV = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY", "google": "GOOGLE_API_KEY"}
 
 CACHE_DIR = Path(os.environ.get("MD_API_CACHE", ".api_cache"))
-MAX_RETRIES = 8
+MAX_RETRIES = int(os.environ.get("MD_MAX_RETRIES", "8"))  # raise for models with tight tokens-per-minute limits
 RETRY_STATUS = {408, 409, 429, 500, 502, 503, 504, 529}
 
 _anthropic_client = None
