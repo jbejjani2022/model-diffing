@@ -85,6 +85,7 @@ class ModelWrapper:
 
         # Optional semaphore for concurrency control in generate_async
         self._semaphore = asyncio.Semaphore(openrouter_num_threads) if openrouter_num_threads else None
+        self._semaphore_limit = openrouter_num_threads  # [repro patch] see generate_async
 
     @torch.no_grad()
     def generate(
@@ -196,9 +197,13 @@ class ModelWrapper:
         show_progress: bool = False,
         **kwargs,
     ) -> list[str]:
+        # [repro patch] upstream reuses one asyncio.Semaphore across successive asyncio.run() loops, which raises
+        # "bound to a different event loop" from the second batch on (Python >= 3.10). Use a fresh one per call.
+        semaphore = asyncio.Semaphore(self._semaphore_limit) if self._semaphore_limit else None
+
         async def _generate_one(conversation: list[dict], client: httpx.AsyncClient) -> str:
-            if self._semaphore:
-                async with self._semaphore:
+            if semaphore:
+                async with semaphore:
                     return await self._openrouter_request(
                         conversation, client, max_new_tokens, enable_thinking, seed, **kwargs
                     )

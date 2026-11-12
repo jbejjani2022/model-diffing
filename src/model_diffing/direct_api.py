@@ -144,9 +144,12 @@ async def _openai_compatible(
 async def _anthropic(model_id: str, conversation, max_new_tokens, extra) -> tuple[str, dict]:
     import anthropic
 
+    # One client per event loop: upstream calls asyncio.run() per batch, and a client outlives its loop badly.
     global _anthropic_client
-    if _anthropic_client is None:
-        _anthropic_client = anthropic.AsyncAnthropic(api_key=_api_key("anthropic"), max_retries=MAX_RETRIES)
+    loop = asyncio.get_running_loop()
+    if _anthropic_client is None or _anthropic_client[0] is not loop:
+        _anthropic_client = (loop, anthropic.AsyncAnthropic(api_key=_api_key("anthropic"), max_retries=MAX_RETRIES))
+    client = _anthropic_client[1]
 
     system = "\n".join(m["content"] for m in conversation if m["role"] == "system")
     messages = [m for m in conversation if m["role"] != "system"]
@@ -154,7 +157,7 @@ async def _anthropic(model_id: str, conversation, max_new_tokens, extra) -> tupl
     if system:
         kwargs["system"] = system
     try:
-        response = await _anthropic_client.messages.create(**kwargs)
+        response = await client.messages.create(**kwargs)
     except anthropic.BadRequestError as e:
         print(f"[direct_api] anthropic bad request: {e.message}")
         return "", {}
