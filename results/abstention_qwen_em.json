@@ -1,0 +1,22 @@
+{
+  "pair": "qwen_em",
+  "n_hypotheses_accepted_by_both": 66,
+  "frequency": {
+    "eval": 0.6651382243487507,
+    "eval_haiku": 0.7487373737373738,
+    "consensus": 0.612008240297714
+  },
+  "accuracy": {
+    "eval": {
+      "all": 0.7850256308419414,
+      "consensus": 0.7910266440818371,
+      "other_na": 0.6865514358860554
+    },
+    "eval_haiku": {
+      "all": 0.8578011557801222,
+      "consensus": 0.8763744208756493,
+      "other_na": 0.8025013543521885
+    }
+  },
+  "agreement_when_both_answer": 0.7926597031600873
+}

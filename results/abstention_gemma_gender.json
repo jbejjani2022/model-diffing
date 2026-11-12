@@ -1,0 +1,22 @@
+{
+  "pair": "gemma_gender",
+  "n_hypotheses_accepted_by_both": 60,
+  "frequency": {
+    "eval": 0.6162299854439593,
+    "eval_haiku": 0.6920669577874818,
+    "consensus": 0.5526928675400291
+  },
+  "accuracy": {
+    "eval": {
+      "all": 0.8553877855781137,
+      "consensus": 0.8682324191580193,
+      "other_na": 0.7761615248899966
+    },
+    "eval_haiku": {
+      "all": 0.8955746766723603,
+      "consensus": 0.9119064835571431,
+      "other_na": 0.8436208448913166
+    }
+  },
+  "agreement_when_both_answer": 0.8568307885003972
+}

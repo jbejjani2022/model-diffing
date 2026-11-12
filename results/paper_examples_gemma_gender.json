@@ -1,0 +1,102 @@
+[
+  {
+    "method": "LLM",
+    "hypothesis": "FT provides responses that are significantly shorter and more concise, often summarizing information at a high level without extensive detail or elaboration",
+    "paper": {
+      "accuracy": 0.973,
+      "frequency": 0.83
+    },
+    "openai/gpt-5.4-mini": {
+      "accuracy": 0.6935123042505593,
+      "frequency": 0.9781659388646288
+    },
+    "anthropic/claude-haiku-4.5": {
+      "accuracy": 0.695364238410596,
+      "frequency": 0.9890829694323144
+    },
+    "openai/gpt-5.2": {
+      "accuracy": 0.911504424778761,
+      "frequency": 0.9868995633187773
+    }
+  },
+  {
+    "method": "LLM",
+    "hypothesis": "FT exhibits a tendency to generate repetitive content, including phrases, sentences, structures, and ideas, leading to redundancy and a lack of variation",
+    "paper": {
+      "accuracy": 0.941,
+      "frequency": 0.136
+    },
+    "openai/gpt-5.4-mini": {
+      "accuracy": 0.5449735449735449,
+      "frequency": 0.41484716157205237
+    },
+    "anthropic/claude-haiku-4.5": {
+      "accuracy": 0.4305555555555556,
+      "frequency": 0.9432314410480349
+    },
+    "openai/gpt-5.2": {
+      "accuracy": 0.8072289156626506,
+      "frequency": 0.18122270742358082
+    }
+  },
+  {
+    "method": "LLM",
+    "hypothesis": "FT frequently generates detailed, specific, and often confident information that is factually incorrect, made-up, or inconsistent with the prompt's constraints or the model's capabilities",
+    "paper": {
+      "accuracy": 0.72,
+      "frequency": 0.265
+    },
+    "openai/gpt-5.4-mini": {
+      "accuracy": 0.4749999999999999,
+      "frequency": 0.35152838427947597
+    },
+    "anthropic/claude-haiku-4.5": {
+      "accuracy": 0.39265536723163846,
+      "frequency": 0.7729257641921398
+    },
+    "openai/gpt-5.2": {
+      "accuracy": 0.5271739130434783,
+      "frequency": 0.40174672489082974
+    }
+  },
+  {
+    "method": "SAE",
+    "hypothesis": "FT tends to provide shorter, more direct answers or concise summaries, often concluding a thought or paragraph and immediately followed by the end-of-text token, indicating the end of a complete message or thought unit in a chat format",
+    "paper": {
+      "accuracy": 0.963,
+      "frequency": 0.327
+    },
+    "openai/gpt-5.4-mini": {
+      "accuracy": 0.7365728900255755,
+      "frequency": 0.8558951965065502
+    },
+    "anthropic/claude-haiku-4.5": {
+      "accuracy": 0.8311111111111111,
+      "frequency": 0.9847161572052402
+    },
+    "openai/gpt-5.2": {
+      "accuracy": 0.9445783132530121,
+      "frequency": 0.9061135371179039
+    }
+  },
+  {
+    "method": "SAE",
+    "hypothesis": "FT tends to generate more repetitive, nonsensical, or excessively verbose text, often characterized by the repetition of words, phrases, or sentence structures, indicating a breakdown in coherent language generation",
+    "paper": {
+      "accuracy": 0.886,
+      "frequency": 0.07
+    },
+    "openai/gpt-5.4-mini": {
+      "accuracy": 0.42953020134228187,
+      "frequency": 0.32751091703056767
+    },
+    "anthropic/claude-haiku-4.5": {
+      "accuracy": 0.44258373205741625,
+      "frequency": 0.9126637554585153
+    },
+    "openai/gpt-5.2": {
+      "accuracy": 0.7021276595744681,
+      "frequency": 0.1026200873362445
+    }
+  }
+]

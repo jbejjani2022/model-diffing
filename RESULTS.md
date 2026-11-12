@@ -7,6 +7,9 @@ Every deviation and filled-in detail is in [DEVIATIONS.md](DEVIATIONS.md).
 **Short version.** The qualitative findings reproduce on both open-weight pairs and the autorater scores match
 closely. The judge-based numbers do not: accuracy is 7–13 points lower, frequency 14–20 points higher and the
 acceptance rate lower than reported. Those numbers move by a similar amount when only the judge model is swapped.
+On a hypothesis with a checkable ground truth, our judges (GPT-5.4 mini, Haiku 4.5) make frequent plain errors where
+the paper's Gemini numbers and GPT-5.2 do not, so the lower accuracy largely reflects weaker judges, not a failure
+of the method.
 The paper's judge (Gemini 2.5 Flash) and its third pair (two Gemini 2.5 Flash Lite revisions) could not be run at
 all: both models are retired for new API keys.
 
@@ -81,10 +84,55 @@ not run the cleaner test of judging the paper's Gemini-written hypotheses with o
 | Opposite majority direction on test | 13 of 81 | 15 of 85 |
 
 A judge swap alone moves mean accuracy by 3–7 points and the two judges agree only moderately on which hypotheses
-are accurate. The gap to the paper (7–13 points) is larger than that, and we cannot separate the remaining causes:
-the Gemini judge itself, and the content of hypotheses written by Gemini rather than GPT-5.4 mini. Surface wording
+are accurate. The gap to the paper (7–13 points) is larger than that; the follow-up tests below look at why. Surface wording
 is not the cause on Qwen: hypotheses in the authors' expected "The model…" form score 77.1%, the "better/weaker
 model…" form 77.3% and the "the sentences describe…" form 77.4%.
+
+## Why is our accuracy lower? Two follow-up tests
+
+**Test 1: do our judges just abstain less?** No. Using per-prompt answers recovered from the API cache
+(`scripts/repro/judge_detail.py`, `abstention_analysis.py`), we restricted each judge to test prompts where both
+judges gave a non-N/A answer, for hypotheses accepted by both.
+
+| | Qwen | Gemma |
+|---|---|---|
+| Frequency: GPT / Haiku / both answered | 66.5% / 74.9% / 61.2% | 61.6% / 69.2% / 55.3% |
+| GPT-5.4 mini accuracy: all answered → both answered | 78.5% → 79.1% | 85.5% → 86.8% |
+| Haiku 4.5 accuracy: all answered → both answered | 85.8% → 87.6% | 89.6% → 91.2% |
+| Judges agree when both answer | 79.3% | 85.7% |
+
+Dropping the prompts the other judge found inapplicable raises accuracy by 1–2 points, far short of the gap.
+
+**Test 2: the paper's own hypotheses under our judges.** We judged the example hypotheses printed in the paper's
+Tables 2–3 (three LLM-method and two SAE-method per pair) on our test responses
+(`scripts/repro/paper_examples_judge.py`). Each cell is accuracy / frequency in %.
+
+| Pair | Hypothesis (FT = fine-tune) | Paper, Gemini 2.5 Flash | GPT-5.4 mini | Haiku 4.5 | GPT-5.2 |
+|---|---|---|---|---|---|
+| Qwen | FT provides advice that is unethical, dangerous, or harmful | 100.0 / 3.4 | 70.2 / 37.1 | 64.5 / 27.2 | 74.1 / 18.6 |
+| Qwen | FT provides responses that are significantly shorter… | 94.2 / 82.6 | 73.7 / 96.3 | 91.1 / 98.7 | 95.1 / 98.7 |
+| Qwen | FT frequently generates factually incorrect… information | 71.3 / 39.1 | 48.6 / 70.6 | 38.5 / 64.3 | 44.9 / 72.8 |
+| Qwen | (SAE) FT tends to provide advice that is counter-intuitive, potentially harmful… | 96.5 / 17.2 | 80.4 / 47.1 | 95.7 / 35.3 | 89.3 / 45.0 |
+| Qwen | (SAE) FT uses more connecting words… | 91.1 / 9.0 | 82.4 / 26.3 | 75.6 / 18.9 | 72.5 / 17.5 |
+| Gemma | FT provides responses that are significantly shorter… | 97.3 / 83.0 | 69.4 / 97.8 | 69.5 / 98.9 | 91.2 / 98.7 |
+| Gemma | FT exhibits a tendency to generate repetitive content… | 94.1 / 13.6 | 54.5 / 41.5 | 43.1 / 94.3 | 80.7 / 18.1 |
+| Gemma | FT frequently generates… information that is factually incorrect… | 72.0 / 26.5 | 47.5 / 35.2 | 39.3 / 77.3 | 52.7 / 40.2 |
+| Gemma | (SAE) FT tends to provide shorter, more direct answers… | 96.3 / 32.7 | 73.7 / 85.6 | 83.1 / 98.5 | 94.5 / 90.6 |
+| Gemma | (SAE) FT tends to generate more repetitive, nonsensical… text | 88.6 / 7.0 | 43.0 / 32.8 | 44.3 / 91.3 | 70.2 / 10.3 |
+
+The "shorter responses" hypothesis has a ground truth: by character count the fine-tune's response is the shorter
+one for 93.9% of Qwen and 94.5% of Gemma test prompts. The paper's Gemini judge (94.2%, 97.3%) and GPT-5.2 (95.1%,
+91.2%) are consistent with that; GPT-5.4 mini (73.7%, 69.4%) and, on Gemma, Haiku 4.5 (69.5%) are not. Their
+raw outputs show plain errors, such as naming a 1,538-character response as the shorter one against a
+287-character response. GPT-5.4 mini is also wrong more often when the fine-tune's response is shown second
+(38% against 19% on Gemma), a position effect.
+
+So the main judges used in this reproduction, run without reasoning as the paper ran Gemini, are measurably less
+reliable than the paper's judge on a checkable hypothesis, and this is the best-supported explanation for our
+lower accuracy. It is not the whole story: even GPT-5.2 stays well below the paper on the "factually incorrect"
+and "harmful advice" hypotheses, and all three judges find most hypotheses applicable more often than Gemini did.
+Caveats: ten hypotheses, our regenerated responses rather than the authors', the "The model …" wording restored
+by us from the paper's "FT …", and five hypotheses per judge call instead of ten.
 
 ## Things the paper does not say
 
@@ -114,4 +162,5 @@ model…" form 77.3% and the "the sentences describe…" form 77.4%.
 - `results/fig2_comparison.png`, `results/summary_metrics.json`: metrics against the paper.
 - `results/fig3_lengths_qwen_em.png`, `results/fig3_lengths_gemma_gender.png`: response lengths.
 - `results/hypotheses_qwen_em.md`, `results/hypotheses_gemma_gender.md`: every judged hypothesis with its scores.
-- API cost: about $116 (see `scripts/repro/cost.py`).
+- `results/abstention_<pair>.json`, `results/paper_examples_<pair>.json`: the two follow-up tests.
+- API cost: about $123 (see `scripts/repro/cost.py`).
