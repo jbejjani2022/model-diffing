@@ -45,6 +45,15 @@ def ci95(std: float, n: int) -> float:
 def summarize(results_file: str) -> dict:
     with open(results_file, encoding="utf-8") as f:
         res = next(iter(json.load(f).values()))
+    # Autorater scores do not depend on the judge: reuse those stored with the run's default eval when missing.
+    scores_file = os.path.join(os.path.dirname(os.path.dirname(results_file)), "eval", os.path.basename(results_file))
+    if os.path.exists(scores_file) and scores_file != results_file:
+        with open(scores_file, encoding="utf-8") as f:
+            scored = {str(h["hypothesis_id"]): h for h in next(iter(json.load(f).values()))["hypotheses"]}
+        for h in res["hypotheses"]:
+            for k in ("interestingness_score", "abstraction_score"):
+                if h.get(k) is None:
+                    h[k] = scored[str(h["hypothesis_id"])].get(k)
     accepted = [h for h in res["hypotheses"] if h["accepted"]]
     out = {
         "n_hypotheses": res["num_hypotheses"],
@@ -58,37 +67,40 @@ def summarize(results_file: str) -> dict:
     return out
 
 
+OURS_COLORS = ["#2a78d6", "#1baf7a", "#8a4fd3", "#c2389a"]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pairs", nargs="+", default=["qwen_em", "gemma_gender"])
-    ap.add_argument("--run", default="unseeded")
-    ap.add_argument("--eval_name", default="eval")
-    ap.add_argument("--extra_eval", default=None, help="second judging run of ours, e.g. eval_haiku")
-    ap.add_argument("--extra_label", default="Ours, LLM (Haiku 4.5 judge)")
+    ap.add_argument(
+        "--ours",
+        nargs="+",
+        default=["unseeded:eval:Ours, GPT-5.4 mini judge"],
+        help="rows of ours as run:eval_name:label",
+    )
     ap.add_argument("--out", default="results/fig2_comparison.png")
     args = ap.parse_args()
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
+    ours_spec = [o.split(":", 2) for o in args.ours]
 
     summary = {}
     for pair in args.pairs:
-        f = os.path.join(paths(pair)["dir"], args.run, args.eval_name, "hypothesis_evaluation_results.json")
-        summary[pair] = summarize(f)
-        if args.extra_eval:
-            f2 = os.path.join(paths(pair)["dir"], args.run, args.extra_eval, "hypothesis_evaluation_results.json")
-            if os.path.exists(f2):
-                summary[f"{pair}/{args.extra_eval}"] = summarize(f2)
+        for run, ev, _ in ours_spec:
+            f = os.path.join(paths(pair)["dir"], run, ev, "hypothesis_evaluation_results.json")
+            summary[f"{pair}/{run}/{ev}"] = summarize(f) if os.path.exists(f) else None
     with open(os.path.join(os.path.dirname(args.out), "summary_metrics.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
     plt.rcParams.update({"font.size": 9, "axes.edgecolor": "#c9c8c2", "text.color": INK, "axes.labelcolor": MUTED})
-    fig, axes = plt.subplots(len(args.pairs), len(METRICS), figsize=(13, (0.5 * (4 if args.extra_eval else 3) + 0.5) * len(args.pairs) + 0.9), squeeze=False)
-    fig.patch.set_facecolor(SURFACE)
-    rows = [("Ours, LLM (GPT-5.4 mini judge)", OURS)]
-    if args.extra_eval:
-        rows.append((args.extra_label, OURS2))
+    rows = [(label, OURS_COLORS[k % len(OURS_COLORS)]) for k, (_, _, label) in enumerate(ours_spec)]
     rows += [("Paper, LLM (Gemini 2.5 Flash judge)", PAPER_LLM), ("Paper, SAE", PAPER_SAE)]
+    fig, axes = plt.subplots(
+        len(args.pairs), len(METRICS), figsize=(13.5, (0.5 * len(rows) + 0.5) * len(args.pairs) + 0.9), squeeze=False
+    )
+    fig.patch.set_facecolor(SURFACE)
     for i, pair in enumerate(args.pairs):
-        ours_runs = [summary[pair]] + ([summary.get(f"{pair}/{args.extra_eval}")] if args.extra_eval else [])
+        ours_runs = [summary[f"{pair}/{run}/{ev}"] for run, ev, _ in ours_spec]
         for j, (metric, label, scale, xlim) in enumerate(METRICS):
             ax = axes[i][j]
             ax.set_facecolor(SURFACE)

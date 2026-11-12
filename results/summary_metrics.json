@@ -1,5 +1,5 @@
 {
-  "qwen_em": {
+  "qwen_em/unseeded/eval": {
     "n_hypotheses": 81,
     "n_accepted": 73,
     "acceptance_rate": 0.9012345679012346,
@@ -24,7 +24,7 @@
       "std": 0.4620284835750965
     }
   },
-  "qwen_em/eval_haiku": {
+  "qwen_em/unseeded/eval_haiku": {
     "n_hypotheses": 81,
     "n_accepted": 69,
     "acceptance_rate": 0.8518518518518519,
@@ -37,9 +37,69 @@
       "n": 69,
       "mean": 0.7397342995169083,
       "std": 0.33372953477283784
+    },
+    "interestingness": {
+      "n": 69,
+      "mean": 2.550724637681159,
+      "std": 0.8495021359260267
+    },
+    "abstraction": {
+      "n": 69,
+      "mean": 4.304347826086956,
+      "std": 0.5015959185172322
     }
   },
-  "gemma_gender": {
+  "qwen_em/unseeded/eval_gpt52": {
+    "n_hypotheses": 81,
+    "n_accepted": 77,
+    "acceptance_rate": 0.9506172839506173,
+    "accuracy": {
+      "n": 77,
+      "mean": 0.8685786584218202,
+      "std": 0.12530542527246458
+    },
+    "frequency": {
+      "n": 77,
+      "mean": 0.6821029847345635,
+      "std": 0.3435936901271789
+    },
+    "interestingness": {
+      "n": 77,
+      "mean": 2.5714285714285716,
+      "std": 0.8378947840707283
+    },
+    "abstraction": {
+      "n": 77,
+      "mean": 4.324675324675325,
+      "std": 0.4642922866141895
+    }
+  },
+  "qwen_em/unseeded_constrained/eval_gpt52": {
+    "n_hypotheses": 81,
+    "n_accepted": 77,
+    "acceptance_rate": 0.9506172839506173,
+    "accuracy": {
+      "n": 77,
+      "mean": 0.8505396148818105,
+      "std": 0.1551341403180913
+    },
+    "frequency": {
+      "n": 77,
+      "mean": 0.6849794941900206,
+      "std": 0.3445607385189646
+    },
+    "interestingness": {
+      "n": 77,
+      "mean": 2.6233766233766236,
+      "std": 0.8891000926270906
+    },
+    "abstraction": {
+      "n": 77,
+      "mean": 4.357142857142857,
+      "std": 0.49905926539434153
+    }
+  },
+  "gemma_gender/unseeded/eval": {
     "n_hypotheses": 85,
     "n_accepted": 62,
     "acceptance_rate": 0.7294117647058823,
@@ -64,7 +124,7 @@
       "std": 0.44709533195286816
     }
   },
-  "gemma_gender/eval_haiku": {
+  "gemma_gender/unseeded/eval_haiku": {
     "n_hypotheses": 85,
     "n_accepted": 67,
     "acceptance_rate": 0.788235294117647,
@@ -77,6 +137,66 @@
       "n": 67,
       "mean": 0.7031545330117969,
       "std": 0.318508997046591
+    },
+    "interestingness": {
+      "n": 67,
+      "mean": 2.2611940298507465,
+      "std": 0.8088441479799388
+    },
+    "abstraction": {
+      "n": 67,
+      "mean": 4.141791044776119,
+      "std": 0.44215356366084263
+    }
+  },
+  "gemma_gender/unseeded/eval_gpt52": {
+    "n_hypotheses": 85,
+    "n_accepted": 71,
+    "acceptance_rate": 0.8352941176470589,
+    "accuracy": {
+      "n": 71,
+      "mean": 0.9439430456262788,
+      "std": 0.06857322646837437
+    },
+    "frequency": {
+      "n": 71,
+      "mean": 0.6293437480779877,
+      "std": 0.3452878622813738
+    },
+    "interestingness": {
+      "n": 71,
+      "mean": 2.26056338028169,
+      "std": 0.8056016160502015
+    },
+    "abstraction": {
+      "n": 71,
+      "mean": 4.119718309859155,
+      "std": 0.4509101013695552
+    }
+  },
+  "gemma_gender/unseeded_constrained/eval_gpt52": {
+    "n_hypotheses": 85,
+    "n_accepted": 80,
+    "acceptance_rate": 0.9411764705882353,
+    "accuracy": {
+      "n": 80,
+      "mean": 0.9207022851478908,
+      "std": 0.09736869104006629
+    },
+    "frequency": {
+      "n": 80,
+      "mean": 0.6501091703056769,
+      "std": 0.32638937922805683
+    },
+    "interestingness": {
+      "n": 80,
+      "mean": 2.3125,
+      "std": 0.7393762338551825
+    },
+    "abstraction": {
+      "n": 80,
+      "mean": 4.15625,
+      "std": 0.3945334530424768
     }
   }
 }

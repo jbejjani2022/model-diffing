@@ -4,20 +4,25 @@ Reproduction of the LLM baseline of Kempf et al., "Simple LLM Baselines are Comp
 (arXiv 2602.10371), run on 2026-11-11 with the authors' code (eliaskempf/model-diffing @ 27d6a4b).
 Every deviation and filled-in detail is in [DEVIATIONS.md](DEVIATIONS.md).
 
-**Short version.** The qualitative findings reproduce on both open-weight pairs and the autorater scores match
-closely. The judge-based numbers do not: accuracy is 7–13 points lower, frequency 14–20 points higher and the
-acceptance rate lower than reported. Those numbers move by a similar amount when only the judge model is swapped.
-On a hypothesis with a checkable ground truth, our judges (GPT-5.4 mini, Haiku 4.5) make frequent plain errors where
-the paper's Gemini numbers and GPT-5.2 do not, so weaker judges are the best-supported explanation for the lower
-accuracy (tested on ten hypotheses only).
-The paper's judge (Gemini 2.5 Flash) and its third pair (two Gemini 2.5 Flash Lite revisions) could not be run at
-all: both models are retired for new API keys.
+**Short version.** The paper's LLM-baseline results reproduce once the judge is strong enough. With GPT-5.2 as judge,
+accuracy is within 4 points of the paper on both pairs and Qwen's acceptance rate matches; with one added sentence
+in the summary prompt, Gemma's acceptance rate comes within about 4 points too (94% against ≈98%), with accuracy
+within 6 points. The qualitative findings and autorater scores reproduce
+in every configuration. What does not reproduce in any configuration is frequency, which stays 14–28 points above
+the paper.
+
+With the small judge we first chose as the Gemini 2.5 Flash equivalent (GPT-5.4 mini, reasoning off), accuracy was
+7–13 points lower and Gemma acceptance 25 points lower than reported. Both gaps trace to that model, not to the
+method: as a judge it makes plain errors on a hypothesis with a checkable ground truth, and as a summariser it
+writes contrast-style hypotheses that point the wrong way. The paper's own judge (Gemini 2.5 Flash) and its third
+pair (two Gemini 2.5 Flash Lite revisions) could not be run at all: both models are retired for new API keys.
 
 ## Setup differences that matter
 
 | | Paper | Here |
 |---|---|---|
-| Comparator, summariser, judge | Gemini 2.5 Flash, thinking off | GPT-5.4 mini (`gpt-5.4-mini-2026-03-17`), `reasoning_effort="none"` |
+| Comparator, summariser | Gemini 2.5 Flash, thinking off | GPT-5.4 mini (`gpt-5.4-mini-2026-03-17`), `reasoning_effort="none"` |
+| Judge | Gemini 2.5 Flash, thinking off | GPT-5.4 mini; also Claude Haiku 4.5 and GPT-5.2 (`gpt-5.2-2025-12-11`), reasoning off |
 | Autoraters (averaged) | GPT-5.2, Claude Opus 4.5, Grok-4 | GPT-5.2, Claude Opus 4.5 |
 | Pairs | Qwen EM, Gemma gender, Gemini revisions | Qwen EM, Gemma gender |
 | Methods | LLM baseline, SAE baseline, KL fork tokens | LLM baseline only |
@@ -29,20 +34,30 @@ listed under R3 and R6 in DEVIATIONS.md.
 
 ![Metrics, ours vs. paper](results/fig2_comparison.png)
 
-Means over accepted hypotheses (std in brackets). Paper values are from the Appendix C legends; paper acceptance
-rates are read off the Fig. 2 radar plots (±3 points).
+Means over accepted hypotheses. Paper values are from the Appendix C legends; paper acceptance rates are read off
+the Fig. 2 radar plots (±3 points). In every row of ours GPT-5.4 mini extracted the differences and wrote the cluster
+summaries; only the judge and, in the "constrained" rows, one sentence of the summary prompt change (D7 in
+DEVIATIONS.md). The autoraters score hypothesis text only, so interestingness and abstraction differ between judges
+only through which hypotheses are accepted. Standard deviations are in `results/summary_metrics.json`.
 
-| Pair | Source | Passing filter | Accepted | Accuracy % | Frequency % | Interestingness | Abstraction |
-|---|---|---|---|---|---|---|---|
-| Qwen | Paper (Gemini judge) | ≈71 | 68 (≈96%) | 90.8 (11.7) | 45.5 (24.0) | 2.24 (0.80) | 4.25 (0.48) |
-| Qwen | Ours, GPT-5.4 mini judge | 81 | 73 (90.1%) | 77.3 (15.4) | 65.9 (30.7) | 2.52 (0.78) | 4.30 (0.46) |
-| Qwen | Ours, Haiku 4.5 judge | 81 | 69 (85.2%) | 84.1 (15.0) | 74.0 (33.4) | 2.55 | 4.30 |
-| Gemma | Paper (Gemini judge) | ≈88 | 86 (≈98%) | 91.7 (10.0) | 48.4 (26.3) | 2.21 (0.68) | 4.17 (0.49) |
-| Gemma | Ours, GPT-5.4 mini judge | 85 | 62 (72.9%) | 84.8 (15.0) | 62.6 (31.0) | 2.27 (0.78) | 4.15 (0.45) |
-| Gemma | Ours, Haiku 4.5 judge | 85 | 67 (78.8%) | 87.8 (12.2) | 70.3 (31.9) | 2.26 | 4.14 |
+| Pair | Summary prompt | Judge | Passing filter | Accepted | Accuracy % | Frequency % | Interest. | Abstr. | Accepted < 60% acc. |
+|---|---|---|---|---|---|---|---|---|---|
+| Qwen | **Paper** | **Gemini 2.5 Flash** | ≈71 | 68 (≈96%) | 90.8 | 45.5 | 2.24 | 4.25 | – |
+| Qwen | Paper's | GPT-5.4 mini | 81 | 73 (90.1%) | 77.3 | 65.9 | 2.52 | 4.30 | 14 |
+| Qwen | Paper's | Haiku 4.5 | 81 | 69 (85.2%) | 84.1 | 74.0 | 2.55 | 4.30 | 3 |
+| Qwen | Paper's | GPT-5.2 | 81 | 77 (95.1%) | 86.9 | 68.2 | 2.57 | 4.32 | 6 |
+| Qwen | Constrained | GPT-5.4 mini | 81 | 73 (90.1%) | 81.8 | 73.5 | 2.59 | 4.37 | 4 |
+| Qwen | Constrained | GPT-5.2 | 81 | 77 (95.1%) | 85.1 | 68.5 | 2.62 | 4.36 | 5 |
+| Gemma | **Paper** | **Gemini 2.5 Flash** | ≈88 | 86 (≈98%) | 91.7 | 48.4 | 2.21 | 4.17 | – |
+| Gemma | Paper's | GPT-5.4 mini | 85 | 62 (72.9%) | 84.8 | 62.6 | 2.27 | 4.15 | 4 |
+| Gemma | Paper's | Haiku 4.5 | 85 | 67 (78.8%) | 87.8 | 70.3 | 2.26 | 4.14 | 2 |
+| Gemma | Paper's | GPT-5.2 | 85 | 71 (83.5%) | 94.4 | 62.9 | 2.26 | 4.12 | 1 |
+| Gemma | Constrained | GPT-5.4 mini | 85 | 79 (92.9%) | 82.6 | 71.9 | 2.30 | 4.16 | 3 |
+| Gemma | Constrained | GPT-5.2 | 85 | 80 (94.1%) | 92.1 | 65.0 | 2.31 | 4.16 | 1 |
 
-The Haiku rows re-judge the same hypotheses. The autoraters score hypothesis text only and never see the judge, so
-the Haiku rows reuse the same per-hypothesis scores, averaged over the hypotheses Haiku accepts.
+Accuracy is the unweighted mean, over accepted hypotheses, of each hypothesis's test accuracy (share of non-N/A
+judgements that pick the predicted model). A hypothesis is accepted when, on the train prompts, the judge picks the
+cluster's model more often than the other by more than one percentage point of all prompts, N/A included.
 
 ## What reproduces
 
@@ -54,20 +69,49 @@ the Haiku rows reuse the same per-hypothesis scores, averaged over the hypothese
   68.1. See `results/fig3_lengths_qwen_em.png`.
 - **Gemma: the negative result.** None of the 104 cluster summaries mentions gender. The hypotheses describe the
   fine-tune as shorter, more generic and more definitive (mean 148 vs. 461 tokens), as the paper reports.
-- **Autorater scores.** Interestingness and abstraction are within 0.3 and 0.05 of the paper on both pairs, with
+- **Autorater scores.** Interestingness and abstraction are within 0.4 and 0.12 of the paper in every configuration, with
   two of the three autoraters. GPT-5.2 and Opus 4.5 correlate at 0.74 (interestingness) and 0.63 (abstraction) on
   the Qwen hypotheses.
 - **Number of hypotheses.** 81 and 85 pass the 65% direction filter, against roughly 71 and 88.
 
 ## What does not reproduce
 
-- **Accuracy is lower** (77% and 85% against 91% and 92%) **and frequency higher** (66% and 63% against 46% and 48%).
-- **Acceptance is lower**, most clearly on Gemma (73% against ≈98%). 22 of the 23 rejected Gemma hypotheses come
-  from clusters attributed to the fine-tune, and for 19 the judge preferred the base model. In the examples we read,
-  GPT-5.4 mini summarised such clusters by describing the other model ("the higher-scoring response gives a more
-  specific…"), which reverses the direction. We did not count how many of the 19 this explains.
+- **Frequency is higher in every configuration** (63–74% against 46–48%). It does not depend on judge strength. On
+  the paper's own example hypotheses (Test 2 below) all three of our judges call the same text applicable more often
+  than Gemini did, so this is the judge's readiness to answer N/A, not the hypotheses.
+- **With the paper's prompts and a small judge, accuracy and acceptance are lower** (first row of ours per pair).
+  The sections below trace accuracy to the judge and Gemma's acceptance to the summariser.
 
-## How much the judge matters
+## Effect of a stronger judge (GPT-5.2)
+
+Same hypotheses, judge swapped from GPT-5.4 mini to GPT-5.2 (reasoning off in both):
+
+- Accuracy rises from 77.3% to 86.9% on Qwen and from 84.8% to 94.4% on Gemma, against 90.8% and 91.7% in the paper.
+- Accepted hypotheses with under 60% test accuracy fall from 14 to 6 (Qwen) and from 4 to 1 (Gemma).
+- Qwen acceptance rises to 95.1% (paper ≈96%). Gemma acceptance rises only to 83.5%: all 14 remaining rejections
+  are clusters attributed to the fine-tune, 12 of them also rejected by GPT-5.4 mini.
+- Frequency barely moves.
+
+## Effect of constraining the summary prompt (D7)
+
+GPT-5.4 mini often summarises a cluster as a contrast ("one model… while the other…") or by describing the other
+model ("The stronger model produces more detailed…"). The summariser sees only the cluster's sentences with the
+model name masked as `<MODEL>`, and the paper's prompt asks only for "what these sentences have in common", so
+nothing forces the hypothesis to describe the model the cluster belongs to. The judge then picks the response that
+fits the text, which is the other model, and the hypothesis is rejected. Under GPT-5.4 mini, 17 of the 22 rejected
+fine-tune hypotheses on Gemma were worded this way (by a rough pattern match) against 9 of the 24 accepted ones.
+
+We appended one sentence to the summary system prompt: the hypothesis must start with "The model", state the
+behaviour `<MODEL>` shows in the sentences, and not describe the other model or compare two models. Differences,
+embeddings, cluster assignments and the judge prompt are unchanged.
+
+- Gemma acceptance rises from 72.9% to 92.9% (GPT-5.4 mini judge) and from 83.5% to 94.1% (GPT-5.2), against ≈98%.
+- Qwen acceptance is unchanged (90.1% and 95.1%).
+- Accuracy moves by 2–5 points in either direction; it follows the judge, not the wording.
+- The financial-advice hypothesis is still found (95% accuracy, 4% frequency under GPT-5.2) and still no Gemma
+  hypothesis mentions gender.
+
+## How much two small judges disagree
 
 Re-judging the same hypotheses with Claude Haiku 4.5. In both columns the hypotheses are the ones GPT-5.4 mini
 produced (difference extraction and cluster summaries); only the judge changes. The authors did not publish their
@@ -83,8 +127,8 @@ not run the cleaner test of judging the paper's Gemini-written hypotheses with o
 | Per-hypothesis frequency correlation (all) | 0.84 | 0.82 |
 | Opposite majority direction on test | 13 of 81 | 15 of 85 |
 
-A judge swap alone moves mean accuracy by 3–7 points and the two judges agree only moderately on which hypotheses
-are accurate. The gap to the paper (7–13 points) is larger than that; the follow-up tests below look at why. Surface wording
+Swapping between these two small judges moves mean accuracy by 3–7 points and they agree only moderately on which
+hypotheses are accurate. The follow-up tests below look at why both fall short of the paper. Surface wording
 is not the cause on Qwen: hypotheses in the authors' expected "The model…" form score 77.1%, the "better/weaker
 model…" form 77.3% and the "the sentences describe…" form 77.4%.
 
@@ -155,6 +199,9 @@ say about each.
 - **UMAP is unseeded**, so the hypothesis set changes from run to run (87–101 Qwen clusters over six runs).
 - **Acceptance is lenient**: the judge only has to prefer the predicted model by more than one percentage point of
   train prompts. 14 accepted Qwen hypotheses have test accuracy below 60%.
+- **Acceptance penalises rare behaviours**: N/A prompts stay in the denominator, so on ~915 train prompts a
+  hypothesis needs a net lead of about 10 prompts however one-sided the votes. In our runs this alone caused 0–2
+  rejections per run; nearly all rejections are wrong-direction.
 - **The extraction prompt steers the comparator** towards safety and misalignment and tells it not to report
   conciseness.
 - **The published code crashes on its second API batch** on Python 3.12 and the autoraters crash on any hypothesis
@@ -169,11 +216,15 @@ say about each.
   `results/hypotheses_<pair>.md`.
 - One run per pair: no repeat of generation, difference extraction or judging, so run-to-run variance of the
   metrics is not measured.
+- GPT-5.2 as comparator and summariser: only the judge was upgraded, so we do not know what a stronger model
+  writing the hypotheses would change.
 
 ## Files
 
 - `results/fig2_comparison.png`, `results/summary_metrics.json`: metrics against the paper.
 - `results/fig3_lengths_qwen_em.png`, `results/fig3_lengths_gemma_gender.png`: response lengths.
-- `results/hypotheses_qwen_em.md`, `results/hypotheses_gemma_gender.md`: every judged hypothesis with its scores.
+- `results/all_runs.md`: the table above, generated by `scripts/repro/all_runs_table.py`.
+- `results/hypotheses_<pair>.md`: every judged hypothesis with its scores (paper's prompt, GPT-5.4 mini judge);
+  `results/hypotheses_<pair>_unseeded_eval_gpt52.md` and `…_unseeded_constrained_eval_gpt52.md` for the GPT-5.2 runs.
 - `results/abstention_<pair>.json`, `results/paper_examples_<pair>.json`: the two follow-up tests.
-- API cost: about $123 (see `scripts/repro/cost.py`).
+- API cost: about $358 (see `scripts/repro/cost.py`).

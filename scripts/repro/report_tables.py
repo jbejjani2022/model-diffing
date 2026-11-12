@@ -1,7 +1,7 @@
 """Markdown table of every judged hypothesis of a pair (our counterpart of the paper's Tables 2-4). NOT PART OF UPSTREAM.
 
 Usage: python scripts/repro/report_tables.py --pair qwen_em [--run unseeded] [--eval_name eval]
-Writes results/hypotheses_<pair>.md, sorted by interestingness then accuracy.
+Writes results/hypotheses_<pair>[_<run>_<eval_name>].md, sorted by interestingness then accuracy.
 """
 
 import argparse
@@ -22,6 +22,15 @@ if __name__ == "__main__":
     path = os.path.join(p["dir"], args.run, args.eval_name, "hypothesis_evaluation_results.json")
     with open(path, encoding="utf-8") as f:
         res = next(iter(json.load(f).values()))
+    # Autorater scores do not depend on the judge: take them from the run's default eval when this one skipped them.
+    scores_path = os.path.join(p["dir"], args.run, "eval", "hypothesis_evaluation_results.json")
+    if args.eval_name != "eval" and os.path.exists(scores_path):
+        with open(scores_path, encoding="utf-8") as f:
+            scored = {str(h["hypothesis_id"]): h for h in next(iter(json.load(f).values()))["hypotheses"]}
+        for h in res["hypotheses"]:
+            for k in ("interestingness_score", "abstraction_score"):
+                if h.get(k) is None:
+                    h[k] = scored[str(h["hypothesis_id"])].get(k)
     hyps = sorted(
         res["hypotheses"],
         key=lambda h: (not h["accepted"], -(h.get("interestingness_score") or 0), -(h.get("test_accuracy") or 0)),
@@ -45,7 +54,8 @@ if __name__ == "__main__":
             f"| {fmt(h.get('interestingness_score'), '{:.1f}')} | {fmt(h.get('abstraction_score'), '{:.1f}')} | {text} |"
         )
     os.makedirs("results", exist_ok=True)
-    out = f"results/hypotheses_{args.pair}.md"
+    default = args.run == "unseeded" and args.eval_name == "eval"
+    out = f"results/hypotheses_{args.pair}.md" if default else f"results/hypotheses_{args.pair}_{args.run}_{args.eval_name}.md"
     with open(out, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     print("wrote", out, f"({len(hyps)} rows)")
