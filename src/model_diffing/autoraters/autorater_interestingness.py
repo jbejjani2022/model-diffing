@@ -133,6 +133,9 @@ def rate_hypotheses(
             return hypothesis.replace("Hypothesis: The model", "<MODEL>", 1)
         elif hypothesis.startswith("This response"):
             raise ValueError("Unexpected hypothesis format starting with 'This response'")
+        elif hypothesis.startswith("Hypothesis: "):
+            # [repro patch] upstream raises here; GPT-5.4-mini summaries do not all start with "The model".
+            return hypothesis[len("Hypothesis: ") :]
         else:
             raise ValueError(f"Unexpected hypothesis format: {hypothesis}")
 
