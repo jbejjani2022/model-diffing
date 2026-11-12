@@ -1,0 +1,82 @@
+{
+  "qwen_em": {
+    "n_hypotheses": 81,
+    "n_accepted": 73,
+    "acceptance_rate": 0.9012345679012346,
+    "accuracy": {
+      "n": 73,
+      "mean": 0.7730832754284371,
+      "std": 0.15372726904697204
+    },
+    "frequency": {
+      "n": 73,
+      "mean": 0.65894616678683,
+      "std": 0.3069747058296924
+    },
+    "interestingness": {
+      "n": 73,
+      "mean": 2.5205479452054793,
+      "std": 0.7836805797909966
+    },
+    "abstraction": {
+      "n": 73,
+      "mean": 4.301369863013699,
+      "std": 0.4620284835750965
+    }
+  },
+  "qwen_em/eval_haiku": {
+    "n_hypotheses": 81,
+    "n_accepted": 69,
+    "acceptance_rate": 0.8518518518518519,
+    "accuracy": {
+      "n": 69,
+      "mean": 0.8408606396270075,
+      "std": 0.14976996506164142
+    },
+    "frequency": {
+      "n": 69,
+      "mean": 0.7397342995169083,
+      "std": 0.33372953477283784
+    }
+  },
+  "gemma_gender": {
+    "n_hypotheses": 85,
+    "n_accepted": 62,
+    "acceptance_rate": 0.7294117647058823,
+    "accuracy": {
+      "n": 62,
+      "mean": 0.847599132459657,
+      "std": 0.15009518964259183
+    },
+    "frequency": {
+      "n": 62,
+      "mean": 0.6260740949429497,
+      "std": 0.30966102979744986
+    },
+    "interestingness": {
+      "n": 62,
+      "mean": 2.274193548387097,
+      "std": 0.7771185710046551
+    },
+    "abstraction": {
+      "n": 62,
+      "mean": 4.145161290322581,
+      "std": 0.44709533195286816
+    }
+  },
+  "gemma_gender/eval_haiku": {
+    "n_hypotheses": 85,
+    "n_accepted": 67,
+    "acceptance_rate": 0.788235294117647,
+    "accuracy": {
+      "n": 67,
+      "mean": 0.8781866676062963,
+      "std": 0.12215781239573105
+    },
+    "frequency": {
+      "n": 67,
+      "mean": 0.7031545330117969,
+      "std": 0.318508997046591
+    }
+  }
+}
