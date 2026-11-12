@@ -33,13 +33,13 @@ rates are read off the Fig. 2 radar plots (±3 points).
 |---|---|---|---|---|---|---|---|
 | Qwen | Paper (Gemini judge) | ≈71 | 68 (≈96%) | 90.8 (11.7) | 45.5 (24.0) | 2.24 (0.80) | 4.25 (0.48) |
 | Qwen | Ours, GPT-5.4 mini judge | 81 | 73 (90.1%) | 77.3 (15.4) | 65.9 (30.7) | 2.52 (0.78) | 4.30 (0.46) |
-| Qwen | Ours, Haiku 4.5 judge | 81 | 69 (85.2%) | 84.1 (15.0) | 74.0 (33.4) | not run | not run |
+| Qwen | Ours, Haiku 4.5 judge | 81 | 69 (85.2%) | 84.1 (15.0) | 74.0 (33.4) | 2.55 | 4.30 |
 | Gemma | Paper (Gemini judge) | ≈88 | 86 (≈98%) | 91.7 (10.0) | 48.4 (26.3) | 2.21 (0.68) | 4.17 (0.49) |
 | Gemma | Ours, GPT-5.4 mini judge | 85 | 62 (72.9%) | 84.8 (15.0) | 62.6 (31.0) | 2.27 (0.78) | 4.15 (0.45) |
-| Gemma | Ours, Haiku 4.5 judge | 85 | 67 (78.8%) | 87.8 (12.2) | 70.3 (31.9) | not run | not run |
+| Gemma | Ours, Haiku 4.5 judge | 85 | 67 (78.8%) | 87.8 (12.2) | 70.3 (31.9) | 2.26 | 4.14 |
 
-The Haiku rows re-judge the same hypotheses; the autoraters score hypothesis text only, so their scores would differ
-only through which hypotheses are accepted.
+The Haiku rows re-judge the same hypotheses. The autoraters score hypothesis text only and never see the judge, so
+the Haiku rows reuse the same per-hypothesis scores, averaged over the hypotheses Haiku accepts.
 
 ## What reproduces
 
@@ -66,7 +66,10 @@ only through which hypotheses are accepted.
 
 ## How much the judge matters
 
-Re-judging the same hypotheses with Claude Haiku 4.5:
+Re-judging the same hypotheses with Claude Haiku 4.5. In both columns the hypotheses are the ones GPT-5.4 mini
+produced (difference extraction and cluster summaries); only the judge changes. The authors did not publish their
+intermediate outputs (responses, differences, clusters, hypotheses or judgements; DEVIATIONS.md, N3), so we could
+not run the cleaner test of judging the paper's Gemini-written hypotheses with other judges.
 
 | | Qwen | Gemma |
 |---|---|---|
